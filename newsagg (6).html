@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FREE CITIZEN REPORT</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#fff; color:#000; font-family:'Courier New',Courier,monospace; }
+a { text-decoration:underline; }
+a:visited { color:inherit; }
+
+/* ── ABOVE FOLD ── */
+#above-fold {
+  display:grid;
+  grid-template-columns:240px 1fr;
+  max-width:1060px;
+  margin:0 auto;
+  padding:8px 12px 0;
+  align-items:start;
+  gap:0;
+}
+
+/* Corner teasers */
+#corner { padding-right:14px; padding-top:4px; }
+#corner a {
+  display:block;
+  font-size:13px;
+  line-height:1.55;
+  text-decoration:underline;
+  color:#000;
+}
+#corner a.lead {
+  color:#cc0000;
+  font-weight:bold;
+  font-size:14px;
+}
+#corner .gap { height:10px; }
+
+/* Hero center */
+#hero-center { text-align:center; }
+#hero-img {
+  display:block;
+  width:100%;
+  max-width:540px;
+  height:290px;
+  object-fit:cover;
+  object-position:center center;
+  margin:0 auto 8px;
+  border:1px solid #aaa;
+}
+.h1 {
+  display:block;
+  font-size:64px;
+  font-weight:bold;
+  color:#000;
+  text-transform:uppercase;
+  text-decoration:underline;
+  line-height:1.05;
+  letter-spacing:-1px;
+}
+.h2 {
+  display:block;
+  font-size:56px;
+  font-weight:bold;
+  color:#000;
+  text-transform:uppercase;
+  text-decoration:underline;
+  line-height:1.05;
+  letter-spacing:-1px;
+}
+.h3 {
+  display:block;
+  font-size:48px;
+  font-weight:bold;
+  color:#cc0000;
+  text-transform:uppercase;
+  text-decoration:underline;
+  line-height:1.05;
+  letter-spacing:-1px;
+  margin-top:2px;
+}
+.h4 {
+  display:block;
+  font-size:28px;
+  font-weight:bold;
+  color:#000;
+  text-transform:uppercase;
+  text-decoration:underline;
+  line-height:1.15;
+  margin-top:6px;
+}
+
+/* Masthead */
+#masthead {
+  text-align:center;
+  border-bottom:4px solid #000;
+  border-top:1px solid #000;
+  max-width:1060px;
+  margin:6px auto 0;
+  padding:2px 0 4px;
+}
+#masthead h1 {
+  font-family:Impact,'Arial Narrow',Arial,sans-serif;
+  font-size:72px;
+  font-weight:900;
+  font-style:italic;
+  color:#000;
+  line-height:1;
+  text-transform:uppercase;
+  letter-spacing:2px;
+}
+.dateline {
+  text-align:center;
+  font-size:11px;
+  font-family:'Courier New',Courier,monospace;
+  letter-spacing:3px;
+  padding:3px 0;
+  border-bottom:1px solid #ccc;
+  max-width:1060px;
+  margin:0 auto;
+}
+
+/* ── THREE COLUMNS ── */
+#cols {
+  display:grid;
+  grid-template-columns:1fr 1px 1fr 1px 1fr;
+  max-width:1060px;
+  margin:0 auto;
+  padding:6px 12px;
+  gap:0;
+}
+.divider { background:#ccc; margin:0 8px; }
+.col { padding:0 8px; }
+
+/* All headlines — uniform bold Courier, no italics, no indents */
+.col a {
+  display:block;
+  font-family:'Courier New',Courier,monospace;
+  font-size:13px;
+  font-weight:bold;
+  line-height:1.4;
+  text-decoration:underline;
+  margin-bottom:2px;
+  text-transform:none;
+}
+.col a.xl {
+  font-size:15px;
+  text-transform:uppercase;
+  margin-bottom:4px;
+}
+.col a.lg {
+  font-size:14px;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+
+.col-l a { color:#003580; }
+.col-c a { color:#000; }
+.col-r a { color:#8b0000; }
+
+/* Source blocks in center only */
+.sources {
+  font-size:10px;
+  font-family:'Courier New',Courier,monospace;
+  line-height:1.8;
+  margin-top:8px;
+  padding-top:6px;
+  border-top:1px solid #ccc;
+  color:#000;
+}
+.sources a { color:#000; font-weight:bold; text-decoration:underline; font-size:10px; }
+.sources strong { display:block; margin-bottom:2px; }
+
+hr.rule { border:none; border-top:1px solid #e0e0e0; margin:5px 0; }
+.dbl { border:none; border-top:2px double #000; margin:6px 0; }
+
+#bottom {
+  text-align:center;
+  border-top:3px solid #000;
+  padding:6px;
+  font-family:'Courier New',Courier,monospace;
+  font-size:10px;
+  letter-spacing:2px;
+  color:#555;
+  max-width:1060px;
+  margin:8px auto 0;
+}
+
+@media(max-width:800px){
+  #above-fold, #cols { grid-template-columns:1fr; }
+  .divider { display:none; }
+  #masthead h1 { font-size:44px; }
+  .h1 { font-size:38px; }
+  .h2 { font-size:32px; }
+  .h3 { font-size:28px; }
+}
+</style>
+</head>
+<body>
+
+<div id="above-fold">
+  <div id="corner">
+    <a class="lead" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">U.S.-ISRAEL LAUNCH 'OPERATION EPIC FURY' ON IRAN...</a>
+    <a href="https://www.washingtonpost.com/world/2026/03/02/mideast-iran-israel-war-civilians/">300 million civilians under umbrella of escalating war...</a>
+    <a href="https://www.npr.org/sections/news">Khamenei confirmed dead after strike on Tehran...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">6 U.S. soldiers killed in Kuwait drone attack...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">B-2 stealth bombers deployed to UK...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Qatar warns oil could double, 'bring down economies'...</a>
+    <div class="gap"></div>
+    <a class="lead" href="https://www.nbcnews.com/politics/trump-administration/trump-says-kristi-noem-stepping-homeland-security-secretary-rcna248719">TRUMP FIRES KRISTI NOEM AS DHS SECRETARY...</a>
+    <a href="https://www.axios.com/2026/03/05/kristi-noem-trump-ice-dhs">Sen. Markwayne Mullin named as replacement...</a>
+    <a href="https://www.cbsnews.com/news/kristi-noem-out-as-secretary-of-homeland-security-markwayne-mullin/">$220M ad scandal was final nail in coffin...</a>
+    <a href="https://www.npr.org/2026/03/05/nx-s1-5667546/kristi-noem-homeland-security-fired">DHS shutdown enters day 20 — workers unpaid...</a>
+    <div class="gap"></div>
+    <a class="lead" href="https://www.axios.com/2026/03/04/iran-war-gas-prices-trump">GAS HITS $3.11 — BIGGEST OVERNIGHT SPIKE SINCE 2022...</a>
+    <a href="https://finance.yahoo.com/news/trump-strikes-iran-could-cost-213222412.html">Iran war could cost U.S. economy $210 billion...</a>
+    <a href="https://www.axios.com/2026/03/05/iran-war-trump-gas-prices">Strait of Hormuz traffic halted — oil nears $100/barrel...</a>
+    <a href="https://www.cnbc.com/2026/03/02/as-trump-declares-inflation-tamed-iran-conflict-threatens-new-price-pressures.html">Gas could hit $4.50/gal if Hormuz stays closed...</a>
+  </div>
+
+  <div id="hero-center">
+    <img id="hero-img" src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/F-22_Raptor_edit1_%28cropped%29.jpg/1280px-F-22_Raptor_edit1_%28cropped%29.jpg" alt="U.S. strikes Iran - Operation Epic Fury"
+      onerror="this.style.display='none';document.getElementById('hero-svg').style.display='block'">
+    <div id="hero-svg" style="display:none;width:100%;max-width:540px;margin:0 auto 8px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="600" height="280" style="display:block;width:100%;margin:0 auto 6px;">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a2a4a"/><stop offset="100%" stop-color="#3a5a8a"/></linearGradient>
+    <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4a3a2a"/><stop offset="100%" stop-color="#2a1a0a"/></linearGradient>
+  </defs>
+  <!-- sky -->
+  <rect width="600" height="280" fill="url(#sky)"/>
+  <!-- stars -->
+  <circle cx="50" cy="20" r="1" fill="white" opacity="0.8"/><circle cx="120" cy="35" r="1" fill="white" opacity="0.6"/><circle cx="200" cy="15" r="1.5" fill="white" opacity="0.9"/><circle cx="350" cy="25" r="1" fill="white" opacity="0.7"/><circle cx="450" cy="18" r="1" fill="white" opacity="0.8"/><circle cx="520" cy="40" r="1" fill="white" opacity="0.5"/><circle cx="80" cy="50" r="1" fill="white" opacity="0.6"/>
+  <!-- large US flag stage backdrop -->
+  <rect x="180" y="20" width="240" height="130" fill="#cc0000" opacity="0.9"/>
+  <rect x="180" y="20" width="240" height="10" fill="#fff"/><rect x="180" y="40" width="240" height="10" fill="#fff"/><rect x="180" y="60" width="240" height="10" fill="#fff"/><rect x="180" y="80" width="240" height="10" fill="#fff"/><rect x="180" y="100" width="240" height="10" fill="#fff"/><rect x="180" y="120" width="240" height="10" fill="#fff"/>
+  <rect x="180" y="20" width="96" height="65" fill="#003087"/>
+  <!-- white stars in canton -->
+  <text x="228" y="62" text-anchor="middle" font-size="20" fill="white" opacity="0.9">★ ★ ★</text><text x="228" y="45" text-anchor="middle" font-size="14" fill="white" opacity="0.9">★ ★ ★ ★</text>
+  <!-- podium -->
+  <rect x="260" y="148" width="80" height="50" rx="2" fill="#2a3a5a"/>
+  <rect x="255" y="195" width="90" height="8" fill="#1a2a4a"/>
+  <!-- figure at podium -->
+  <ellipse cx="300" cy="138" rx="14" ry="16" fill="#f5d5b0"/>
+  <rect x="284" y="152" width="32" height="40" rx="3" fill="#1a1a3a"/>
+  <!-- tie -->
+  <polygon points="298,154 302,154 305,185 295,185" fill="#cc0000"/>
+  <!-- arms -->
+  <rect x="270" y="158" width="14" height="6" rx="3" fill="#1a1a3a" transform="rotate(-15,270,161)"/>
+  <rect x="316" y="158" width="14" height="6" rx="3" fill="#1a1a3a" transform="rotate(15,330,161)"/>
+  <!-- stage floor -->
+  <rect x="0" y="198" width="600" height="82" fill="url(#floor)"/>
+  <!-- audience silhouettes -->
+  <ellipse cx="80" cy="220" rx="18" ry="22" fill="#111"/><ellipse cx="130" cy="225" rx="16" ry="20" fill="#111"/><ellipse cx="160" cy="218" rx="17" ry="21" fill="#111"/>
+  <ellipse cx="440" cy="220" rx="18" ry="22" fill="#111"/><ellipse cx="490" cy="225" rx="16" ry="20" fill="#111"/><ellipse cx="520" cy="218" rx="17" ry="21" fill="#111"/>
+  <ellipse cx="60" cy="250" rx="20" ry="18" fill="#0a0a0a"/><ellipse cx="100" cy="255" rx="19" ry="17" fill="#0a0a0a"/>
+  <ellipse cx="460" cy="250" rx="20" ry="18" fill="#0a0a0a"/><ellipse cx="510" cy="255" rx="19" ry="17" fill="#0a0a0a"/>
+  <!-- spotlights -->
+  <polygon points="100,0 140,198 60,198" fill="white" opacity="0.04"/>
+  <polygon points="500,0 540,198 460,198" fill="white" opacity="0.04"/>
+  <polygon points="300,0 340,198 260,198" fill="white" opacity="0.06"/>
+</svg>
+    </div>
+    <a class="h1" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">U.S. AND ISRAEL STRIKE IRAN:</a>
+    <a class="h2" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">KHAMENEI DEAD, WAR WIDENS</a>
+    <a class="h3" href="https://www.npr.org/sections/news">OIL SURGES 35%; BIGGEST GAIN IN HISTORY</a>
+    <a class="h4" href="https://www.cnn.com/2026/03/05/us/5-things-to-know-for-march-5-travel-disruptions-war-powers-electricity-costs-white-house-renovation-weight-loss-drugs">17,500 AMERICANS EVACUATED FROM MIDDLE EAST</a>
+  </div>
+</div>
+
+<div id="masthead"><h1>Free Citizen Report</h1></div>
+<div class="dateline">FRIDAY, MARCH 6, 2026</div>
+
+<div id="cols">
+
+  <!-- LEFT -->
+  <div class="col col-l">
+    <a class="xl" href="https://www.washingtonpost.com/world/2026/03/02/mideast-iran-israel-war-civilians/">IRAN WAR SPREADS DANGER ACROSS DOZEN NATIONS...</a>
+    <a href="https://www.washingtonpost.com/world/2026/03/02/mideast-iran-israel-war-civilians/">300 million civilians now caught in crossfire...</a>
+    <a href="https://www.npr.org/sections/news">Spain bars U.S. use of military bases, defying Trump...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Turkey, NATO shoot down Iranian ballistic missile...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Senate rejects war powers resolution to check Trump...</a>
+    <hr class="rule">
+    <a class="xl" href="https://www.nbcnews.com/politics/trump-administration/trump-says-kristi-noem-stepping-homeland-security-secretary-rcna248719">TRUMP FIRES NOEM — FIRST CABINET CASUALTY OF 2ND TERM...</a>
+    <a href="https://www.cbsnews.com/news/kristi-noem-out-as-secretary-of-homeland-security-markwayne-mullin/">$220M self-promo ad campaign sealed her fate...</a>
+    <a href="https://www.axios.com/2026/03/05/kristi-noem-trump-ice-dhs">Newsom: 'Most incompetent DHS chief in history'...</a>
+    <a href="https://www.npr.org/2026/03/05/nx-s1-5667546/kristi-noem-homeland-security-fired">DHS shutdown enters day 20 — workers unpaid...</a>
+    <a href="https://www.newsweek.com/kristi-noem-fired-donald-trump-dhs-markwayne-mullin-live-updates-11629203">Fetterman: 'I am AYE' on confirming Mullin...</a>
+    <hr class="rule">
+    <a class="xl" href="https://finance.yahoo.com/news/trump-strikes-iran-could-cost-213222412.html">SUPREME COURT STRUCK DOWN TRUMP TARIFFS LAST MONTH...</a>
+    <a href="https://www.themirror.com/news/politics/trump-iran-210-billion-cost-1714603">900+ companies now suing for $179B tariff refund...</a>
+    <a href="https://www.cnbc.com/2026/03/02/as-trump-declares-inflation-tamed-iran-conflict-threatens-new-price-pressures.html">Economists warn of stagflation as oil surges...</a>
+    <hr class="rule">
+    <a href="https://www.npr.org/sections/news">Jan. 6 pardonee sentenced to life for child sex abuse...</a>
+    <a href="https://www.npr.org/sections/news">Dozens of pardoned rioters in new legal trouble since release...</a>
+    <hr class="rule">
+    <a href="https://www.npr.org/sections/news">DHS surveillance web targets citizens critical of policies...</a>
+    <a href="https://www.npr.org/sections/news">Trump urged pregnant women off Tylenol — scientists push back...</a>
+    <a href="https://www.axios.com/2026/03/05/iran-war-trump-gas-prices">Yellen: 'Fed now even more on hold'...</a>
+    <hr class="rule">
+    <a href="https://www.washingtonpost.com/world/2026/03/02/mideast-iran-israel-war-civilians/">Iraq suffers nationwide blackout amid regional chaos...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Air France suspends Cuba flights — fuel shortage cited...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">UAE stock exchanges reopen after 2-day halt...</a>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CENTER -->
+  <div class="col col-c">
+    <a class="xl" href="https://www.npr.org/sections/news">DOJ RELEASES MORE EPSTEIN FILES AFTER NPR PROBE</a>
+    <a class="lg" href="https://www.npr.org/sections/news">TRUMP-LINKED PAGES WITHHELD — NOW PUBLISHED UNDER PRESSURE...</a>
+    <a href="https://www.npr.org/sections/news">Dozens of pages on abuse accusations removed by DOJ...</a>
+    <a href="https://www.npr.org/sections/news">Dems demand special counsel for Epstein cover-up...</a>
+    <hr class="dbl">
+    <a class="xl" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">IRAN WAR: ISRAEL PLANS 2 MORE WEEKS OF STRIKES</a>
+    <a class="lg" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">5,000+ BOMBS DROPPED — HEGSETH CLAIMS AIR SUPREMACY...</a>
+    <a href="https://www.npr.org/sections/national/">Six U.S. soldiers killed in Kuwait drone attack...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Turkey, NATO shoot down Iranian ballistic missile...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Cancellation of Army exercises fuels deployment speculation...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">'Big one' on the way? B-2 stealth bombers heading to UK...</a>
+    <hr class="rule">
+    <a class="lg" href="https://www.axios.com/2026/03/05/iran-war-trump-gas-prices">IRAN SUPPLY CHAIN SHOCK — SUEZ REROUTED AROUND AFRICA...</a>
+    <a href="https://www.axios.com/2026/03/05/iran-war-trump-gas-prices">Qatar LNG production disabled — weeks to restart...</a>
+    <a href="https://finance.yahoo.com/news/trump-strikes-iran-could-cost-213222412.html">War could cost American economy up to $210 billion...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Kuwait cuts oil production as fallout intensifies...</a>
+    <hr class="rule">
+    <a href="https://www.golocalprov.com/news/5-big-news-stories-overnight-friday-march-6-2026">Paramount $111B deal to acquire Warner Bros. Discovery...</a>
+    <a href="https://www.golocalprov.com/news/5-big-news-stories-overnight-friday-march-6-2026">CNN and CBS News to merge under same roof...</a>
+    <a href="https://www.npr.org/sections/news">TikTok case: Trump accused of helping broker sale to allies...</a>
+    <a href="https://www.npr.org/sections/national/">2026 World Cup: 100 days out, facing major uncertainty...</a>
+    <hr class="rule">
+    <a href="https://www.cnn.com/2026/03/05/us/5-things-to-know-for-march-5-travel-disruptions-war-powers-electricity-costs-white-house-renovation-weight-loss-drugs">Total lunar eclipse turns moon crimson — next not until 2028...</a>
+    <a href="https://www.cnn.com/2026/03/05/us/5-things-to-know-for-march-5-travel-disruptions-war-powers-electricity-costs-white-house-renovation-weight-loss-drugs">Lou Holtz, Notre Dame football legend, has died...</a>
+    <a href="https://www.golocalprov.com/news/5-big-news-stories-overnight-friday-march-6-2026">Costco CEO vows to return tariff refund value to members...</a>
+    <div class="sources">
+      <strong>SOURCES:</strong>
+      <a href="https://apnews.com">AP</a> &nbsp;
+      <a href="https://www.reuters.com">REUTERS</a> &nbsp;
+      <a href="https://www.bbc.com/news">BBC</a> &nbsp;
+      <a href="https://thehill.com">THE HILL</a> &nbsp;
+      <a href="https://www.axios.com">AXIOS</a> &nbsp;
+      <a href="https://www.politico.com">POLITICO</a> &nbsp;
+      <a href="https://www.nytimes.com">NY TIMES</a> &nbsp;
+      <a href="https://www.washingtonpost.com">WASH POST</a> &nbsp;
+      <a href="https://www.foxnews.com">FOX NEWS</a> &nbsp;
+      <a href="https://www.breitbart.com">BREITBART</a> &nbsp;
+      <a href="https://www.bloomberg.com">BLOOMBERG</a> &nbsp;
+      <a href="https://www.wsj.com">WALL ST JOURNAL</a> &nbsp;
+      <a href="https://citizenfreepress.com">CITIZEN FREE PRESS</a> &nbsp;
+      <a href="https://drudgereport.com">DRUDGE REPORT</a> &nbsp;
+      <a href="https://mynewsbuffet.com/customized-news/">MY NEWS BUFFET</a>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- RIGHT -->
+  <div class="col col-r">
+    <a class="xl" href="https://citizenfreepress.com">CITIZEN FREE PRESS — LIVE UPDATES...</a>
+    <a href="https://drudgereport.com">DRUDGE REPORT — TOP STORIES...</a>
+    <a href="https://mynewsbuffet.com/customized-news/">MY NEWS BUFFET — CUSTOMIZED FEED...</a>
+    <hr class="rule">
+    <a class="xl" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">HEGSETH: IRAN MILITARY 'EVAPORATING BY THE HOUR'...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Trump: U.S. will have uncontested air supremacy within days...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">France authorizes use of bases for U.S. operations...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Taiwan, Somaliland condemn Iranian counterattacks...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Trump: 'All for' Kurdish invasion of western Iran...</a>
+    <hr class="rule">
+    <a class="xl" href="https://www.npr.org/2026/03/05/nx-s1-5667546/kristi-noem-homeland-security-fired">MULLIN NAMED NEW DHS CHIEF — 'MAGA WARRIOR' TAKES OVER...</a>
+    <a href="https://www.kptv.com/2026/03/05/kristi-noem-replaced-dhs-secretary-trump-says/">Former MMA fighter, only Native American in Senate...</a>
+    <a href="https://www.newsweek.com/kristi-noem-fired-donald-trump-dhs-markwayne-mullin-live-updates-11629203">Fetterman: 'I am AYE' on confirming Mullin...</a>
+    <a href="https://abcnews.com/Politics/trump-privately-expresses-frustration-noem-after-senate-hearing/story?id=130794961">Trump 'mad as a murder hornet' after Noem ad testimony...</a>
+    <hr class="rule">
+    <a class="xl" href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">TRUMP BACKED REGIME CHANGE FROM DAY ONE OF STRIKES...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">IRGC urged to lay down arms or 'face certain death'...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Anti-government protests rocked Iran since December...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">Prince Reza Pahlavi: 'Regime change is coming'...</a>
+    <hr class="rule">
+    <a href="https://finance.yahoo.com/news/trump-strikes-iran-could-cost-213222412.html">White House: Operation 'Bold and Necessary Exercise'...</a>
+    <a href="https://finance.yahoo.com/news/trump-iran-war-adds-potential-202107501.html">Only 1-in-4 Americans support Iran strikes — including GOP...</a>
+    <a href="https://www.nbcnews.com/business/markets/iran-war-threaten-upend-trump-economic-gains-gas-groceries-rcna261599">S&amp;P up 13% in year one — war now threatens those gains...</a>
+    <a href="https://www.nbcnews.com/business/markets/iran-war-threaten-upend-trump-economic-gains-gas-groceries-rcna261599">Interceptor shortage worries flare in world capitals...</a>
+    <hr class="rule">
+    <a href="https://www.cbsnews.com/">Wars often lose public support over time. This one started without much...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">No deal except 'unconditional surrender'...</a>
+    <a href="https://en.wikipedia.org/wiki/2026_Iran%E2%80%93United_States_crisis">USA backs $20B reinsurance program for oil tankers...</a>
+  </div>
+
+</div>
+
+<div id="bottom">
+  FREE CITIZEN REPORT &#9632; ALL SOURCES LINKED DIRECTLY &#9632; NO EDITORIAL POSITION TAKEN<br>
+  <span style="font-size:9px;letter-spacing:1px;">ALWAYS EDITED BY A HUMAN BEING &#9632; FRIDAY, MARCH 6, 2026</span>
+</div>
+</body>
+</html>
