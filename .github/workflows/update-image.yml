@@ -1,0 +1,28 @@
+name: Update Hero Image
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install requests
+      - name: Fetch image
+        env:
+          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
+        run: python fetch_image.py
+      - name: Commit image
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add hero.jpg
+          git diff --staged --quiet || git commit -m "Update hero image"
+          git push
