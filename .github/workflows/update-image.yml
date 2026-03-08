@@ -9,16 +9,54 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+
       - name: Install deps
         run: pip install requests
+
       - name: Fetch image
         env:
           PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
-        run: python fetch_image.py
+        run: |
+          python - <<'EOF'
+          import requests, os, sys
+
+          key = os.environ.get("PIXABAY_KEY", "")
+          saved = False
+
+          if key:
+              try:
+                  r = requests.get(
+                      "https://pixabay.com/api/",
+                      params={"key": key, "q": "news politics", "image_type": "photo",
+                              "orientation": "horizontal", "min_width": 400, "per_page": 5},
+                      timeout=15)
+                  hits = r.json().get("hits", [])
+                  if hits:
+                      img = requests.get(hits[0]["webformatURL"], timeout=15)
+                      with open("hero.jpg", "wb") as f:
+                          f.write(img.content)
+                      print("Saved Pixabay image")
+                      saved = True
+              except Exception as e:
+                  print(f"Pixabay failed: {e}")
+
+          if not saved:
+              try:
+                  url = "https://www.defense.gov/Portals/1/Images/DOD-Images/OfficialPhotos/Secretary/thumb/2024-secdef-austin-official-photo.jpg"
+                  img = requests.get(url, timeout=15)
+                  with open("hero.jpg", "wb") as f:
+                      f.write(img.content)
+                  print("Saved DoD fallback image")
+              except Exception as e:
+                  print(f"Fallback failed: {e}")
+                  sys.exit(1)
+          EOF
+
       - name: Commit image
         run: |
           git config user.name "github-actions"
