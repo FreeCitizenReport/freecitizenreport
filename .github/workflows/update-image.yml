@@ -16,44 +16,93 @@ jobs:
           python-version: '3.11'
 
       - name: Install deps
-        run: pip install requests
+        run: pip install requests beautifulsoup4
 
       - name: Fetch image
-        env:
-          PIXABAY_KEY: ${{ secrets.PIXABAY_KEY }}
         run: |
           python - <<'EOF'
-          import requests, os, sys
+          import requests, re, sys
+          from bs4 import BeautifulSoup
 
-          key = os.environ.get("PIXABAY_KEY", "")
-          saved = False
+          # Step 1: Extract first hero headline URL from index.html
+          hero_url = None
+          try:
+              with open("index.html", "r") as f:
+                  html = f.read()
+              match = re.search(r'class="hero[^"]*"\s+href="([^"]+)"', html)
+              if match:
+                  hero_url = match.group(1)
+                  print(f"Hero URL: {hero_url}")
+          except Exception as e:
+              print(f"Could not parse index.html: {e}")
 
-          if key:
+          # Step 2: Fetch og:image from that article
+          og_image = None
+          if hero_url:
               try:
-                  r = requests.get(
-                      "https://pixabay.com/api/",
-                      params={"key": key, "q": "news politics", "image_type": "photo",
-                              "orientation": "horizontal", "min_width": 400, "per_page": 5},
-                      timeout=15)
-                  hits = r.json().get("hits", [])
-                  if hits:
-                      img = requests.get(hits[0]["webformatURL"], timeout=15)
+                  headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"}
+                  r = requests.get(hero_url, headers=headers, timeout=15)
+                  soup = BeautifulSoup(r.text, "html.parser")
+                  tag = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "og:image"})
+                  if tag and tag.get("content"):
+                      og_image = tag["content"]
+                      print(f"og:image found: {og_image}")
+              except Exception as e:
+                  print(f"og:image scrape failed: {e}")
+
+          # Step 3: Download the image
+          saved = False
+          if og_image:
+              try:
+                  headers = {"User-Agent": "Mozilla/5.0"}
+                  img = requests.get(og_image, headers=headers, timeout=15)
+                  if img.status_code == 200 and len(img.content) > 5000:
                       with open("hero.jpg", "wb") as f:
                           f.write(img.content)
-                      print("Saved Pixabay image")
+                      print("Saved og:image successfully")
                       saved = True
+                  else:
+                      print(f"Image download suspicious: status={img.status_code} size={len(img.content)}")
               except Exception as e:
-                  print(f"Pixabay failed: {e}")
+                  print(f"Image download failed: {e}")
 
+          # Step 4: Fallback — try second and third hero URLs
+          if not saved:
+              print("Trying additional hero URLs...")
+              try:
+                  with open("index.html", "r") as f:
+                      html = f.read()
+                  all_urls = re.findall(r'class="hero[^"]*"\s+href="([^"]+)"', html)
+                  for url in all_urls[1:4]:
+                      try:
+                          headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36"}
+                          r = requests.get(url, headers=headers, timeout=15)
+                          soup = BeautifulSoup(r.text, "html.parser")
+                          tag = soup.find("meta", property="og:image") or soup.find("meta", attrs={"name": "og:image"})
+                          if tag and tag.get("content"):
+                              img = requests.get(tag["content"], headers={"User-Agent": "Mozilla/5.0"}, timeout=15)
+                              if img.status_code == 200 and len(img.content) > 5000:
+                                  with open("hero.jpg", "wb") as f:
+                                      f.write(img.content)
+                                  print(f"Saved fallback og:image from {url}")
+                                  saved = True
+                                  break
+                      except Exception as e:
+                          print(f"Fallback URL failed: {e}")
+                          continue
+              except Exception as e:
+                  print(f"Fallback loop failed: {e}")
+
+          # Step 5: Last resort — Wikipedia public domain image
           if not saved:
               try:
-                  url = "https://www.defense.gov/Portals/1/Images/DOD-Images/OfficialPhotos/Secretary/thumb/2024-secdef-austin-official-photo.jpg"
+                  url = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg/640px-US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg"
                   img = requests.get(url, timeout=15)
                   with open("hero.jpg", "wb") as f:
                       f.write(img.content)
-                  print("Saved DoD fallback image")
+                  print("Saved Wikipedia last-resort image")
               except Exception as e:
-                  print(f"Fallback failed: {e}")
+                  print(f"Last resort failed: {e}")
                   sys.exit(1)
           EOF
 
