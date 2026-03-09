@@ -45,19 +45,19 @@ jobs:
               try:
                   r = requests.get(img_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
                   if r.status_code != 200 or len(r.content) < 15000:
-                      print(f"  ✗ bad response/size ({r.status_code}, {len(r.content)} bytes)")
+                      print(f"  x bad response/size ({r.status_code}, {len(r.content)} bytes)")
                       return None
                   img = Image.open(io.BytesIO(r.content))
                   w, h = img.size
                   ratio = w / h
                   if w < 400 or h < 150 or ratio < 1.0:
-                      print(f"  ✗ rejected {w}x{h} ratio={ratio:.2f}")
+                      print(f"  x rejected {w}x{h} ratio={ratio:.2f}")
                       return None
                   score = w * h
-                  print(f"  ✓ accepted {w}x{h} score={score}")
+                  print(f"  + accepted {w}x{h} score={score}")
                   return (score, r.content)
               except Exception as e:
-                  print(f"  ✗ error: {e}")
+                  print(f"  x error: {e}")
               return None
 
           def save_best(candidates, filename):
@@ -70,26 +70,23 @@ jobs:
               print(f"  >> Saved {filename}")
               return True
 
-          # ── Parse index.html ──────────────────────────────────────────
           with open("index.html", "r") as f:
               html = f.read()
 
-          # Hero URLs — all unique href values from hero links
           hero_urls = list(dict.fromkeys(
               re.findall(r'class="hero[^"]*"\s+href="([^"]+)"', html)
           ))
           print(f"Hero URLs: {hero_urls}\n")
 
-          # Column thumbnail URLs — find href immediately after each img src
           def url_after_img(src_name):
               pattern = rf'src="{src_name}".*?<a[^>]+href="([^"]+)"'
               m = re.search(pattern, html, re.DOTALL)
               return m.group(1) if m else None
 
           slots = [
-              (hero_urls,                        "hero.jpg",      True),   # hero: try ALL urls
-              (url_after_img("img_left1.jpg"),   "img_left1.jpg", False),
-              (url_after_img("img_left2.jpg"),   "img_left2.jpg", False),
+              (hero_urls,                        "hero.jpg",       True),
+              (url_after_img("img_left1.jpg"),   "img_left1.jpg",  False),
+              (url_after_img("img_left2.jpg"),   "img_left2.jpg",  False),
               (url_after_img("img_center1.jpg"), "img_center1.jpg", False),
               (url_after_img("img_center2.jpg"), "img_center2.jpg", False),
               (url_after_img("img_right1.jpg"),  "img_right1.jpg", False),
@@ -109,7 +106,6 @@ jobs:
                       if result:
                           candidates.append(result)
               if not save_best(candidates, filename) and filename == "hero.jpg":
-                  # last resort for hero only
                   try:
                       fb = requests.get("https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg/640px-US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg", timeout=12)
                       with open("hero.jpg", "wb") as f:
@@ -125,6 +121,8 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add hero.jpg img_left1.jpg img_left2.jpg img_center1.jpg img_center2.jpg img_right1.jpg
+          for f in hero.jpg img_left1.jpg img_left2.jpg img_center1.jpg img_center2.jpg img_right1.jpg; do
+            [ -f "$f" ] && git add "$f"
+          done
           git diff --staged --quiet || git commit -m "Update images"
           git push
