@@ -1,11 +1,12 @@
-name: Update Hero Image
+name: Update Headlines
+
 on:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '*/15 * * * *'   # Every 15 min (GitHub's practical minimum)
   workflow_dispatch:
 
 jobs:
-  update-image:
+  update-headlines:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -16,207 +17,153 @@ jobs:
           python-version: '3.11'
 
       - name: Install deps
-        run: pip install requests beautifulsoup4 Pillow
+        run: pip install requests beautifulsoup4 lxml
 
-      - name: Fetch all images
+      - name: Fetch RSS and rewrite headlines
         run: |
-          python - <<'EOF'
-          import requests, re, sys, io, time
+          python3 - << 'EOF'
+          import requests, re, html as htmllib
           from bs4 import BeautifulSoup
-          from PIL import Image
+          from datetime import datetime, timezone
 
           HEADERS = {
               "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36",
-              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-              "Accept-Language": "en-US,en;q=0.5",
           }
 
-          # Known junk images to reject by URL substring
-          JUNK_PATTERNS = [
-              "npr.org/assets/img/podcast",
-              "podcast-thumbnail",
-              "logo",
-              "favicon",
-              "avatar",
-              "placeholder",
-              "default-og",
-              "static/images/social",
+          # ── RSS sources ────────────────────────────────────────────────
+          RSS_FEEDS = [
+              ("AP Top News",    "https://feeds.apnews.com/rss/apf-topnews"),
+              ("Reuters World",  "https://feeds.reuters.com/reuters/worldNews"),
+              ("Reuters US",     "https://feeds.reuters.com/reuters/domesticNews"),
+              ("BBC World",      "http://feeds.bbci.co.uk/news/world/rss.xml"),
+              ("NPR News",       "https://feeds.npr.org/1001/rss.xml"),
           ]
 
-          def is_junk_url(url):
-              u = url.lower()
-              return any(p in u for p in JUNK_PATTERNS)
+          SKIP_WORDS = ["subscribe", "newsletter", "podcast", "listen now", "watch live", "photo gallery"]
 
-          def fetch_via_archive(url):
-              """Fetch page HTML via archive.is/newest/, following redirects to actual snapshot."""
-              archive_url = f"https://archive.is/newest/{url}"
+          def fetch_rss(name, url):
               try:
-                  # Step 1: GET archive.is/newest/ — it will redirect to snapshot URL
-                  r = requests.get(archive_url, headers=HEADERS, timeout=15, allow_redirects=False)
-                  
-                  # Step 2: Follow the redirect to the actual snapshot
-                  if r.status_code in (301, 302, 303, 307, 308):
-                      snapshot_url = r.headers.get("Location", "")
-                      if snapshot_url:
-                          print(f"  archive.is redirect -> {snapshot_url[:60]}")
-                          r2 = requests.get(snapshot_url, headers=HEADERS, timeout=15)
-                          if r2.status_code == 200 and len(r2.text) > 5000:
-                              return r2.text
-                  
-                  # Step 3: Sometimes archive.is returns 200 directly with the snapshot
-                  if r.status_code == 200 and len(r.text) > 5000:
-                      # Check it's not a captcha/waiting page
-                      if "Redirecting" not in r.text[:500] and "DDoS" not in r.text[:500]:
-                          return r.text
-                  
-                  print(f"  archive.is returned {r.status_code}, trying direct fetch")
+                  r = requests.get(url, headers=HEADERS, timeout=12)
+                  r.raise_for_status()
+                  soup = BeautifulSoup(r.content, "xml")
+                  items = []
+                  for item in soup.find_all("item")[:8]:
+                      title = item.find("title")
+                      link  = item.find("link")
+                      if not title or not link:
+                          continue
+                      t = htmllib.unescape(title.get_text(strip=True))
+                      l = link.get_text(strip=True) if link.get_text(strip=True).startswith("http") else link.next_sibling
+                      if not l or not str(l).startswith("http"):
+                          continue
+                      l = str(l).strip()
+                      # Skip boring items
+                      if any(w in t.lower() for w in SKIP_WORDS):
+                          continue
+                      # Truncate long titles
+                      if len(t) > 80:
+                          t = t[:77] + "..."
+                      items.append((t, l))
+                  print(f"  {name}: {len(items)} stories")
+                  return items
               except Exception as e:
-                  print(f"  archive.is failed: {e}")
-              
-              # Step 4: Fall back to direct fetch
-              try:
-                  r = requests.get(url, headers=HEADERS, timeout=15)
-                  if r.status_code == 200:
-                      return r.text
-              except Exception as e:
-                  print(f"  direct fetch failed: {e}")
-              
-              return None
+                  print(f"  {name} FAILED: {e}")
+                  return []
 
-          def get_og_image(url):
-              """Get og:image from a URL, trying archive.is first."""
-              print(f"  Fetching: {url[:70]}")
-              html = fetch_via_archive(url)
-              if not html:
-                  return None
-              try:
-                  soup = BeautifulSoup(html, "html.parser")
-                  # Try multiple meta tag formats
-                  tag = (soup.find("meta", property="og:image") or
-                         soup.find("meta", property="og:image:url") or
-                         soup.find("meta", attrs={"name": "og:image"}) or
-                         soup.find("meta", property="twitter:image") or
-                         soup.find("meta", attrs={"name": "twitter:image"}))
-                  if tag and tag.get("content"):
-                      img_url = tag["content"]
-                      # Make sure URL is absolute
-                      if img_url.startswith("//"):
-                          img_url = "https:" + img_url
-                      if not img_url.startswith("http"):
-                          return None
-                      if is_junk_url(img_url):
-                          print(f"  x junk URL rejected: {img_url[:60]}")
-                          return None
-                      print(f"  og:image: {img_url[:70]}")
-                      return img_url
-              except Exception as e:
-                  print(f"  og:image parse failed: {e}")
-              return None
+          def make_teaser_line(title, url, color=None, italic=False):
+              escaped_title = htmllib.escape(title).upper()
+              if not escaped_title.endswith("..."):
+                  escaped_title += "..."
+              inner = f'<i>{escaped_title}</i>' if italic else escaped_title
+              if color:
+                  inner = f'<font color="{color}">{inner}</font>'
+              return f'<a href="{htmllib.escape(url)}">{inner}</a><br>'
 
-          def fetch_and_score(img_url):
-              """Download image and score by pixel area. Returns (score, bytes) or None."""
-              try:
-                  r = requests.get(img_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=12)
-                  if r.status_code != 200:
-                      print(f"  x download failed: status {r.status_code}")
-                      return None
-                  if len(r.content) < 15000:
-                      print(f"  x too small: {len(r.content)} bytes")
-                      return None
-                  img = Image.open(io.BytesIO(r.content))
-                  w, h = img.size
-                  ratio = w / h
-                  if w < 400 or h < 150:
-                      print(f"  x too small: {w}x{h}")
-                      return None
-                  if ratio < 1.0:
-                      print(f"  x portrait rejected: {w}x{h}")
-                      return None
-                  score = w * h
-                  print(f"  + accepted {w}x{h} score={score}")
-                  return (score, r.content)
-              except Exception as e:
-                  print(f"  x score error: {e}")
-              return None
+          def make_hero_line(title, url, red=False):
+              escaped = htmllib.escape(title.upper())
+              cls = 'class="hero red"' if red else 'class="hero"'
+              return f'<a {cls} href="{htmllib.escape(url)}">{escaped}</a>'
 
-          def save_best(candidates, filename):
-              if not candidates:
-                  print(f"  No valid images for {filename}")
-                  return False
-              candidates.sort(key=lambda x: x[0], reverse=True)
-              with open(filename, "wb") as f:
-                  f.write(candidates[0][1])
-              print(f"  >> Saved {filename} (best score={candidates[0][0]})")
-              return True
+          # ── Fetch all feeds ────────────────────────────────────────────
+          all_stories = []
+          for name, url in RSS_FEEDS:
+              stories = fetch_rss(name, url)
+              all_stories.extend(stories)
 
-          # ── Parse index.html ──────────────────────────────────────────
+          # Deduplicate by URL
+          seen_urls = set()
+          unique = []
+          for t, u in all_stories:
+              if u not in seen_urls:
+                  seen_urls.add(u)
+                  unique.append((t, u))
+
+          print(f"Total unique stories: {len(unique)}")
+
+          if len(unique) < 4:
+              print("Too few stories — skipping update to preserve existing content")
+              exit(0)
+
+          # ── Build new teaser block (top 10 stories, first 2 red) ──────
+          teaser_lines = []
+          for i, (title, url) in enumerate(unique[:10]):
+              color = "#cc0000" if i < 2 else None
+              italic = (i % 3 == 2)   # every 3rd is italic for visual variety
+              teaser_lines.append(make_teaser_line(title, url, color=color, italic=italic))
+
+          new_teasers = "\n".join(teaser_lines)
+
+          # ── Build new hero block (top 7 stories, first 2 red) ─────────
+          hero_lines = []
+          for i, (title, url) in enumerate(unique[:7]):
+              red = (i < 2)
+              hero_lines.append(make_hero_line(title, url, red=red))
+
+          new_hero_inner = "\n".join(hero_lines)
+          new_hero_block = f'<div style="text-align:center; padding:2px 0;">\n<b>\n{new_hero_inner}\n</b>\n</div>'
+
+          # ── Patch index.html ───────────────────────────────────────────
           with open("index.html", "r") as f:
-              html = f.read()
+              page = f.read()
 
-          # Hero URLs — unique, order preserved
-          hero_urls = list(dict.fromkeys(
-              re.findall(r'class="hero[^"]*"\s+href="([^"]+)"', html)
-          ))
-          print(f"Hero URLs: {hero_urls}\n")
+          # Replace teasers
+          page = re.sub(
+              r'<!-- AUTO-TEASERS-START -->.*?<!-- AUTO-TEASERS-END -->',
+              f'<!-- AUTO-TEASERS-START -->\n{new_teasers}\n<!-- AUTO-TEASERS-END -->',
+              page, flags=re.DOTALL
+          )
 
-          # Column thumbnail slots — find first href after each img src
-          def url_after_img(src_name):
-              pattern = rf'src="{src_name}".*?<a[^>]+href="([^"]+)"'
-              m = re.search(pattern, html, re.DOTALL)
-              if m:
-                  print(f"  {src_name} -> {m.group(1)[:70]}")
-                  return m.group(1)
-              print(f"  {src_name} -> NOT FOUND")
-              return None
+          # Replace hero headlines
+          page = re.sub(
+              r'<!-- AUTO-HERO-START -->.*?<!-- AUTO-HERO-END -->',
+              f'<!-- AUTO-HERO-START -->\n{new_hero_block}\n<!-- AUTO-HERO-END -->',
+              page, flags=re.DOTALL
+          )
 
-          print("Column URL mapping:")
-          slots = [
-              (hero_urls,                        "hero.jpg",        True),
-              (url_after_img("img_left1.jpg"),   "img_left1.jpg",   False),
-              (url_after_img("img_left2.jpg"),   "img_left2.jpg",   False),
-              (url_after_img("img_center1.jpg"), "img_center1.jpg", False),
-              (url_after_img("img_center2.jpg"), "img_center2.jpg", False),
-              (url_after_img("img_right1.jpg"),  "img_right1.jpg",  False),
-          ]
+          # Update the date/time stamp in footer
+          now_utc = datetime.now(timezone.utc)
+          day_name = now_utc.strftime("%A").upper()
+          month_name = now_utc.strftime("%B").upper()
+          day_num = now_utc.strftime("%-d")
+          year = now_utc.year
+          time_str = now_utc.strftime("%H:%M UTC")
+          new_stamp = f"{day_name}, {month_name} {day_num}, {year} &#9632; UPDATED {time_str}"
+          page = re.sub(
+              r'ALWAYS EDITED BY A HUMAN BEING &#9632; [^<]+',
+              f'ALWAYS EDITED BY A HUMAN BEING &#9632; {new_stamp}',
+              page
+          )
 
-          # ── Fetch each slot ───────────────────────────────────────────
-          for url_or_list, filename, multi in slots:
-              print(f"\n=== {filename} ===")
-              candidates = []
-              urls = url_or_list if multi else ([url_or_list] if url_or_list else [])
-              for url in urls:
-                  if not url:
-                      continue
-                  og = get_og_image(url)
-                  if og:
-                      result = fetch_and_score(og)
-                      if result:
-                          candidates.append(result)
-                  time.sleep(1)  # be polite to archive.is
+          with open("index.html", "w") as f:
+              f.write(page)
 
-              if not save_best(candidates, filename) and filename == "hero.jpg":
-                  # Last resort fallback for hero only
-                  try:
-                      fb = requests.get(
-                          "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/"
-                          "US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg/"
-                          "640px-US_Navy_030501-N-5362A-004_President_George_W._Bush_speaks_aboard_USS_Abraham_Lincoln.jpg",
-                          timeout=12)
-                      with open("hero.jpg", "wb") as f:
-                          f.write(fb.content)
-                      print("  >> Saved Wikipedia fallback for hero")
-                  except Exception as e:
-                      print(f"  fallback failed: {e}")
-
-          print("\nAll done.")
+          print("index.html updated successfully.")
           EOF
 
-      - name: Commit images
+      - name: Commit updated headlines
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          for f in hero.jpg img_left1.jpg img_left2.jpg img_center1.jpg img_center2.jpg img_right1.jpg; do
-            [ -f "$f" ] && git add "$f"
-          done
-          git diff --staged --quiet || git commit -m "Update images"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Auto-update headlines $(date -u +'%Y-%m-%d %H:%M UTC')"
           git push
