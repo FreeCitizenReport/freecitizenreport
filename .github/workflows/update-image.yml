@@ -104,9 +104,10 @@ jobs:
               print("Too few stories — skipping update to preserve existing content")
               exit(0)
 
-          # ── Build new teaser block (top 10 stories, first 2 red) ──────
+          # ── Build new teaser block (stories 6-16, avoiding hero duplication) ──
           teaser_lines = []
-          for i, (title, url) in enumerate(unique[:10]):
+          teaser_stories = unique[6:16] if len(unique) > 6 else unique
+          for i, (title, url) in enumerate(teaser_stories):
               color = "#cc0000" if i < 2 else None
               italic = (i % 3 == 2)   # every 3rd is italic for visual variety
               teaser_lines.append(make_teaser_line(title, url, color=color, italic=italic))
@@ -120,7 +121,7 @@ jobs:
               hero_lines.append(make_hero_line(title, url, red=red))
 
           new_hero_inner = "\n".join(hero_lines)
-          new_hero_block = f'<div style="text-align:center; padding:2px 0;">\n<b>\n{new_hero_inner}\n</b>\n</div>'
+          new_hero_block = f'<div style="text-align:center; padding:2px 0; max-width:820px; margin:0 auto;">\n<b>\n{new_hero_inner}\n</b>\n</div>'
 
           # ── Patch index.html ───────────────────────────────────────────
           with open("index.html", "r") as f:
